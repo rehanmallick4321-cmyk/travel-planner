@@ -296,4 +296,6 @@ def render_auth_page() -> None:
             if submitted:
                 try:
                     supabase = get_supabase()
-                    res = supabase.auth.sign_in_with_password(
+                    res = res = supabase.auth.sign_in_with_password(
+    {"email": email, "password": password}
+)
