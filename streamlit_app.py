@@ -103,7 +103,7 @@ def generate_itinerary_with_gemini(trip_data: dict, feedback: str = "") -> dict:
         )
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    model = genai.GenerativeModel("gemini-3.8-flash")
 
     destination = trip_data.get("destination", "Unknown")
     country = trip_data.get("country") or ""
