@@ -1,0 +1,12 @@
+-- Seed file for TripCraft AI
+-- After running the migration, you can insert test data here.
+-- Note: You need a valid auth.users entry first (sign up through the app).
+-- Then use that user's UUID to insert test trips.
+
+-- Example (replace the UUID with your actual user ID):
+--
+-- INSERT INTO public.trips (user_id, destination, country, start_date, end_date, num_days, budget_level, travel_style, num_travelers, status)
+-- VALUES
+--   ('your-user-uuid', 'Tokyo', 'Japan', '2025-04-01', '2025-04-07', 7, 'mid-range', 'cultural', 2, 'draft'),
+--   ('your-user-uuid', 'Paris', 'France', '2025-06-15', '2025-06-20', 5, 'luxury', 'romantic', 2, 'draft'),
+--   ('your-user-uuid', 'Bali', 'Indonesia', '2025-08-01', '2025-08-10', 10, 'budget', 'adventure', 1, 'draft');
