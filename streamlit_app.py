@@ -187,14 +187,13 @@ Rules:
 
 
 def save_generated_itinerary(supabase: Client, trip_id: str, ai_result: dict) -> None:
-    """Persist AI-generated days and activities using bulk inserts (3 queries total instead of 30+)."""
+    """Persist AI-generated days and activities using bulk inserts."""
     supabase.table("itinerary_days").delete().eq("trip_id", trip_id).execute()
 
     days_list = ai_result.get("days", [])
     if not days_list:
         return
 
-    # 1. Bulk insert all days in a single network call
     days_payload = [
         {
             "trip_id": trip_id,
@@ -208,7 +207,6 @@ def save_generated_itinerary(supabase: Client, trip_id: str, ai_result: dict) ->
     day_res = supabase.table("itinerary_days").insert(days_payload).execute()
     day_id_by_num = {row["day_number"]: row["id"] for row in day_res.data}
 
-    # 2. Bulk insert all activities across all days in a single network call
     activities_payload = []
     for day in days_list:
         day_id = day_id_by_num.get(day.get("day_number"))
@@ -236,7 +234,6 @@ def save_generated_itinerary(supabase: Client, trip_id: str, ai_result: dict) ->
     if activities_payload:
         supabase.table("activities").insert(activities_payload).execute()
 
-    # 3. Update trip status & clear cached reads
     supabase.table("trips").update({"status": "generated"}).eq("id", trip_id).execute()
     fetch_itinerary.clear()
     fetch_user_trips.clear()
@@ -258,7 +255,7 @@ def fetch_user_trips(user_id: str, access_token: str) -> list[dict]:
 
 @st.cache_data(ttl=300, max_entries=50)
 def fetch_itinerary(trip_id: str, access_token: str) -> list[dict]:
-    """Fetch all days and nested activities in a SINGLE Supabase join query."""
+    """Fetch all days and nested activities in a single Supabase join query."""
     supabase = get_supabase()
     days = (
         supabase.table("itinerary_days")
@@ -296,6 +293,8 @@ def render_auth_page() -> None:
             if submitted:
                 try:
                     supabase = get_supabase()
-                    res = res = supabase.auth.sign_in_with_password(
-    {"email": email, "password": password}
-)
+                    res = supabase.auth.sign_in_with_password({"email": email, "password": password})
+                    st.session_state["user"] = res.user
+                    st.session_state["session"] = res.session
+                    st.success("Welcome back!")
+                    st.rerun()
